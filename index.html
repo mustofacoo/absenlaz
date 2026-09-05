@@ -234,6 +234,7 @@
                     <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;">Status</th>
                     <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;">Masuk</th>
                     <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;">Pulang</th>
+                    <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;">Keterangan</th>
                     <th style="padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;">Aksi</th>
                   </tr>
                 </thead>
@@ -248,12 +249,15 @@
                     </td>
                     <td style="padding:12px 14px;font-size:13px;color:#374151;">{{ row.check_in || '-' }}</td>
                     <td style="padding:12px 14px;font-size:13px;color:#374151;">{{ row.check_out || '-' }}</td>
+                    <td style="padding:12px 14px;font-size:12px;color:#6B7280;max-width:220px;white-space:normal;">
+                      {{ ['sakit','izin','tugas_luar'].includes(row.status) ? (row.note || '-') : '-' }}
+                    </td>
                     <td style="padding:12px 14px;">
                       <button @click="openEditAttendance(row)" style="padding:5px 10px;background:#EBF5FB;color:#dd861c;font-size:12px;font-weight:600;border:none;border-radius:8px;">Edit</button>
                     </td>
                   </tr>
                   <tr v-if="filteredReport.length===0">
-                    <td colspan="6" style="padding:24px;text-align:center;font-size:14px;color:#9CA3AF;">Tidak ada data</td>
+                    <td colspan="7" style="padding:24px;text-align:center;font-size:14px;color:#9CA3AF;">Tidak ada data</td>
                   </tr>
                 </tbody>
               </table>
@@ -358,6 +362,7 @@
                   <div style="flex:1;min-width:0;">
                     <p style="font-size:13px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ getUserName(a.user_id) }}</p>
                     <p :style="`font-size:11px;font-weight:600;color:${statusColor(a.status)};`">{{ statusLabel(a.status) }}</p>
+                    <p v-if="['izin','sakit','tugas_luar'].includes(a.status) && a.note" style="font-size:11px;color:#6B7280;margin-top:1px;white-space:normal;">{{ a.note }}</p>
                   </div>
                   <div style="text-align:right;flex-shrink:0;">
                     <p style="font-size:13px;font-weight:700;color:#111827;">{{ a.check_in || '-' }}</p>
