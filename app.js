@@ -608,6 +608,13 @@ const filteredReport = computed(() => {
     }
 
     // ===== EXPORT CSV REKAP =====
+    // Escape field CSV agar aman kalau keterangan mengandung koma, kutip, atau baris baru
+    function csvEscape(val) {
+      const s = String(val ?? '');
+      if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+      return s;
+    }
+
 function exportCSV() {
   const [fy, fm] = reportFilter.month.split('-').map(Number);
   const startDate = new Date(fy, fm - 2, 21);
@@ -634,12 +641,16 @@ function exportCSV() {
     'Sakit',
     'Izin',
     'Dinas Luar',
-    'Alpha'
+    'Alpha',
+    'Keterangan Sakit',
+    'Keterangan Izin',
+    'Keterangan Tugas Luar'
   ]);
 
   for (const user of users) {
     let hadir=0, tepat=0, terlambatR=0, terlambatS=0, terlambatB=0;
     let sakit=0, izin=0, tugas=0, alpha=0;
+    const ketSakit = [], ketIzin = [], ketTugas = [];
 
     const cur = new Date(startDate);
     while (cur <= cap) {
@@ -647,6 +658,7 @@ function exportCSV() {
       if (!isWeekend(dateStr)) {
         const att = attendanceLookup[`${user.id}_${dateStr}`];
         const s = att ? att.status : 'alpha';
+        const tgl = new Date(dateStr).toLocaleDateString('id-ID', { day:'numeric', month:'short' });
         if (s === 'hadir') {
           hadir++;
           const cat = getArrivalCategory(att.check_in);
@@ -655,9 +667,9 @@ function exportCSV() {
           else if (cat?.key === 'terlambat_sedang')  terlambatS++;
           else if (cat?.key === 'terlambat_berat')   terlambatB++;
         }
-        else if (s === 'sakit')      sakit++;
-        else if (s === 'izin')       izin++;
-        else if (s === 'tugas_luar') tugas++;
+        else if (s === 'sakit')      { sakit++;  if (att?.note) ketSakit.push(`${tgl}: ${att.note}`); }
+        else if (s === 'izin')       { izin++;   if (att?.note) ketIzin.push(`${tgl}: ${att.note}`); }
+        else if (s === 'tugas_luar') { tugas++;  if (att?.note) ketTugas.push(`${tgl}: ${att.note}`); }
         else if (s === 'alpha')      alpha++;
       }
       cur.setDate(cur.getDate() + 1);
@@ -673,12 +685,15 @@ function exportCSV() {
       sakit,
       izin,
       tugas,
-      alpha
+      alpha,
+      ketSakit.join(' | '),
+      ketIzin.join(' | '),
+      ketTugas.join(' | ')
     ]);
   }
 
-  // Buat konten CSV
-  const csvContent = rows.map(r => r.join(',')).join('\n');
+  // Buat konten CSV (setiap field di-escape agar aman dari koma/kutip pada keterangan)
+  const csvContent = rows.map(r => r.map(csvEscape).join(',')).join('\n');
   const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
