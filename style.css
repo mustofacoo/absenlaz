@@ -1,0 +1,12 @@
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #F0F4F8; min-height: 100vh; }
+  #app { max-width: 430px; margin: 0 auto; min-height: 100vh; background: #F0F4F8; position: relative; }
+  .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
+  .fade-enter-from, .fade-leave-to { opacity: 0; }
+  input, select, textarea { font-family: 'Plus Jakarta Sans', sans-serif; }
+  button { font-family: 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
+  .scrollable { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 4px; }
